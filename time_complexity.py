@@ -80,29 +80,31 @@ def print_header(n):
 def display_row(name, t):
     name = '{:8}'.format(name)
     (time, label) = convert_time(t)
-    time = '{:>14}'.format(time)
-    row = "%s | %s %s" % (name, time, label)
+    time = '{:>6}'.format(time)
+    row = " %s | %s %s" % (name, time, label)
     print(row)
 
 # Convert microseconds to other time durations
 def convert_time(t):
     label = "ms  ."
     time = t
-    mult = 1000
 
-    if t < 1000: # less than 1 microsecond
-        time = '{:>14}'.format("<1")
-    elif t < (1000 * 1000): # µs to ms
+    if t < 1000: # less than 1 millisecond
+        time = '{:>6}'.format("<1")
+    elif t < (1000 * 1000): # milliseconds
         time = round(t/1000)
-    elif t < (1000 * 1000 * 1000): # µs to ms to sec
+    elif t < (1000 * 1000 * 60): # seconds
         time = round(t/1_000_000)
         label = "sec .."
-    elif t < (1000 * 1000 * 1000 * 60) : # µs to ms to sec to min
+    elif t < (1000 * 1000 * 60 * 60): # minutes
         time = round(t/60_000_000)
         label = "min ..."
-    else: # µs to ms to sec to min to hr
+    elif t < (1000 * 1000 * 60 * 60 * 24): # hours
         time = round(t/3_600_000_000)
         label = "hr  ...."
+    else: # days
+        time = round(t/86_400_000_000)
+        label = "day ....."
 
     return (time, label)
 
