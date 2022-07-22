@@ -1,78 +1,130 @@
 import time
-import numpy as np
 import math
 
-def function0(n):
-  n += 1
-  function0.name = 'O(1)'
+# constant time: O(1)
+def o_constant(n):
+    o_constant.name = 'O(1)'
+    k = 0
+    k += 1
 
-def function1(n):
-  if n == 0:
-    return 0 
-  else:
-    n = math.floor(n/2)
-  function1.name = 'O(logn)'
+# Logarithmic time: O(logn)
+def o_logarithmic(n):
+    o_logarithmic.name = 'O(logn)'
+    k = 1
+    while (k < n):
+        k*=2
 
-def function2(n):
-  k = 0
-  while (k < n):
-  	k+=1
-  function2.name = 'O(n)'
+# Linear time: O(n)
+def o_linear(n):
+    o_linear.name = 'O(n)'
+    k = 0
+    while (k < n):
+    	k+=1
 
-def function3(n):
-  k = i = 0 
-  j = 1 
-  while (i < n):
-  	i+=1
-  	while (j < n):
-  	  j= j*2
-  	  k+=1
-  function3.name = 'o(nlogn)'
+# Quasi-Linear time: O(nlogn)
+def o_quasilinear(n):
+    o_quasilinear.name = 'O(nlogn)'
+    k = i = 0
+    j = 1
+    while (i < n):
+    	i+=1
+    	while (j < n):
+            j*=2
+            k+=1
 
-def function4(n):
-  k = i = j = 0
-  while (i < n):
-    i += 1
-    while (j < n):
-      j+=1
-      k+=1
-  function4.name = 'o(n^2)'
+# Quadratic time: O(n^2)
+def o_quadratic(n):
+    o_quadratic.name = 'O(n^2)'
+    k = i = j = 0
+    while (i < n):
+        i += 1
+        while (j < n):
+            j+=1
+            k+=1
 
-def function5(n):
-  function5.name = 'o(2^n)'
-  if n == 0:
-    return 0 
-  elif n == 1:
-    return 1 
-  return function5(n-1) + function5(n-2)
+# Exponential time: O(2^n)
+def o_exponential(n):
+    o_exponential.name = 'O(2^n)'
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    return o_exponential(n-1) + o_exponential(n-2)
 
-def function6(n):
-  function6.name = 'o(n!)'
-  if n == 0:
-    return 0 
-  i = 0
-  while(i<n):
-    function6(n-1)
-    i+=1
+# Factorial time: O(n!)
+def o_factorial(n):
+    o_factorial.name = 'O(n!)'
+    if n == 0:
+        return 0
+    i = 0
+    while(i<n):
+        o_factorial(n-1)
+        i+=1
 
-def run_function(function, n, ratio):
-  start_time = round(time.time() * 1000)
-  function(int(n)/int(ratio))
-  end_time = round(time.time() * 1000)
-  time_used = f"total time used for {function.name} with n={n}: {(end_time-start_time)*ratio} ms"
-  print(time_used)
+# Calculate function runtime for a given input size
+def run_function(function, n, ratio=1):
+    start_time = time.time() * 1000000
+    function(int(n) / int(ratio))
+    end_time = time.time() * 1000000
 
+    total_time = round((end_time - start_time) * ratio)
+    display_row(function.name, total_time)
 
+# Display chart header
+def print_header(n):
+    number = "{:_}".format(n)
+    print("\n n =", number)
+    print("-"*30)
 
-def run_functions():
-  n = input("enter n: ")
-  run_function(function0, n, 1)
-  run_function(function1, n, 1)
-  run_function(function2, n, 1)
-  run_function(function3, n, 1)
-  run_function(function4, n, 1)
-  run_function(function5, n, 40000)
-  run_function(function6, n, 100000)
+# Display row in chart
+def display_row(name, t):
+    name = '{:8}'.format(name)
+    (time, label) = convert_time(t)
+    time = '{:>14}'.format(time)
+    row = "%s | %s %s" % (name, time, label)
+    print(row)
 
+# Convert microseconds to other time durations
+def convert_time(t):
+    label = "ms  ."
+    time = t
+    mult = 1000
 
-run_functions()
+    if t < 1000: # less than 1 microsecond
+        time = '{:>14}'.format("<1")
+    elif t < (1000 * 1000): # µs to ms
+        time = round(t/1000)
+    elif t < (1000 * 1000 * 1000): # µs to ms to sec
+        time = round(t/1_000_000)
+        label = "sec .."
+    elif t < (1000 * 1000 * 1000 * 60) : # µs to ms to sec to min
+        time = round(t/60_000_000)
+        label = "min ..."
+    else: # µs to ms to sec to min to hr
+        time = round(t/3_600_000_000)
+        label = "hr  ...."
+
+    return (time, label)
+
+# Get input size from user
+def get_n():
+    print("default n value: 1_000_000")
+    n = input("enter n: ")
+    if not n:
+        n = 1_000_000
+    return int(n)
+
+# Run all functions
+def run_functions(n):
+    run_function(o_constant, n)
+    run_function(o_logarithmic, n)
+    run_function(o_linear, n)
+    run_function(o_quasilinear, n)
+    run_function(o_quadratic, n)
+    run_function(o_exponential, n, int(n/25)) # run n = 25 then extrapolate
+    run_function(o_factorial, n, int(n/10))   # run n = 10 then extrapolate
+
+# main
+n = get_n()
+print_header(n)
+run_functions(n)
